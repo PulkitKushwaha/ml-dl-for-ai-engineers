@@ -160,4 +160,4 @@ ML
 
 ---
 
-*Part of [ml-dl-for-ai-engineers](https://github.com/your-username/ml-dl-for-ai-engineers) — a learning journal.*
+*Part of [ml-dl-for-ai-engineers](https://github.com/PulkitKushwaha/ml-dl-for-ai-engineers) — a learning journal.*
