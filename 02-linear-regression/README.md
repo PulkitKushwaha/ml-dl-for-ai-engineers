@@ -112,7 +112,7 @@ The learning rate is a hyperparameter you set before training. It controls how l
 |---|---|---|
 | Too high | Loss goes up or oscillates wildly | Overshoots valley, may diverge |
 | Just right | Loss steadily decreases | Finds minimum efficiently |
-| Too low | Loss decreases agonisingly slowly | May get stuck, takes forever |
+| Too low | Loss decreases agonisingly slowly | May get stuck in a loca minima, takes forever |
 
 Common starting values: 0.1, 0.01, 0.001 — found by experimentation or a learning rate scheduler.
 
