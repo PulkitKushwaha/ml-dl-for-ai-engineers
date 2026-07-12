@@ -115,4 +115,4 @@ flowchart TD
 
 ---
 
-*Part of [ml-dl-for-ai-engineers](https://github.com/your-username/ml-dl-for-ai-engineers) — a learning journal built while targeting Agentic AI Engineer roles at product companies.*
+*Part of [ml-dl-for-ai-engineers](https://github.com/PulkitKushwaha/ml-dl-for-ai-engineers) — a learning journal built while targeting Agentic AI Engineer roles at product companies.*
