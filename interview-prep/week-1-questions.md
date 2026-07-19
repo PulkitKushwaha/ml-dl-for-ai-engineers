@@ -54,7 +54,7 @@ A: No. Total error = Bias² + Variance + Irreducible Error. Irreducible error is
 
 **Q: You are predicting song popularity from two features — weeks in top 10 (range 1–52) and number of singles (range 1–5). Should you scale? Which method?**
 
-A: Yes, scaling is required for linear regression because gradient descent is sensitive to feature magnitude. Weeks in top 10 would dominate during training due to its larger range. Use standardisation (Z-score) as the safer default — it handles the different distributions well and is robust to outliers. Normalisation works but is sensitive to extreme values.
+A: Yes, scaling is required for linear regression because gradient descent is sensitive to feature magnitude. Weeks in top 10 would dominate during training due to its larger range. Use standardisation (Z-score) as the safer default — it handles different distributions well and is robust to outliers. Normalisation works but is sensitive to extreme values.
 
 ---
 
@@ -66,25 +66,25 @@ A: The cost function measures how wrong the model's current predictions are acro
 
 **Q: Explain gradient descent in plain English — no math, no jargon.**
 
-A: Gradient descent is an algorithm that finds the lowest point in a hilly landscape while blindfolded. You can only feel which direction is downhill right under your feet. You take a small step downhill, feel again, take another step, and repeat until the ground feels flat — you have reached the bottom. In ML: the landscape is the loss function, the valley is the minimum error, and each step is a weight update. Gradient descent is the algorithm that navigates there step by step.
+A: Gradient descent is an algorithm that finds the lowest point in a hilly landscape while blindfolded. You can only feel which direction is downhill right under your feet. You take a small step downhill, feel again, take another step, and repeat until the ground feels flat — you have reached the bottom. In ML: the landscape is the loss function, the valley is the minimum error, and each step is a weight update.
 
 ---
 
 **Q: Your model's loss keeps going up during training instead of down. What is the most likely cause and fix?**
 
-A: High learning rate — the model is taking steps that are too large and overshooting the minimum, bouncing around or diverging entirely. Fix: decrease the learning rate. Secondary check: ensure features are scaled — unscaled features can also destabilise gradient descent. Consider switching to Adam optimiser which adapts the learning rate automatically.
+A: High learning rate — the model is taking steps that are too large and overshooting the minimum. Fix: decrease the learning rate (not increase it). Secondary check: ensure features are scaled. Consider switching to Adam optimiser which adapts the learning rate automatically.
 
 ---
 
 **Q: When would you use MAE instead of MSE as your loss function?**
 
-A: When your data has genuine outliers that you do not want to over-penalise. MSE squares errors so a single extreme outlier contributes massively to the loss and distorts training. MAE treats all errors linearly so outliers have proportional influence. Example: predicting album sales where one viral album sold 100x more than any other — MAE handles this better. Use Huber loss as a middle ground when you have some outliers but still want MSE behaviour for small errors.
+A: When your data has genuine outliers you do not want to over-penalise. MSE squares errors so a single extreme outlier contributes massively to the loss and distorts training. MAE treats all errors linearly so outliers have proportional influence. Use Huber loss as a middle ground when you have some outliers but still want MSE behaviour for small errors.
 
 ---
 
 **Q: When would you not use linear regression?**
 
-A: When any of its assumptions are violated: (1) the relationship is non-linear — switch to polynomial features or tree-based models, (2) features are highly correlated (multicollinearity) — weights become unstable, use Ridge regression or PCA, (3) error variance is not constant (heteroscedasticity) — try log-transforming the target, (4) data points are not independent (e.g. time series) — use time-series specific models.
+A: When its assumptions are violated: (1) non-linear relationship — switch to polynomial features or tree-based models, (2) multicollinearity — weights become unstable, use Ridge regression or PCA, (3) heteroscedasticity — try log-transforming the target, (4) non-independent data (e.g. time series) — use time-series specific models.
 
 ---
 
@@ -92,31 +92,89 @@ A: When any of its assumptions are violated: (1) the relationship is non-linear 
 
 **Q: Is logistic regression a regression or classification algorithm? Why the confusing name?**
 
-A: Classification algorithm. The "regression" in the name refers to the internal mathematical technique it uses (a linear weighted sum), not what it outputs. The output is always a probability converted to a class — never a continuous number.
+A: Classification algorithm. The "regression" refers to the internal mathematical technique (a linear weighted sum), not the output type. Output is always a probability converted to a class — never a continuous number.
 
 ---
 
 **Q: What does the sigmoid function do and why does logistic regression need it?**
 
-A: The sigmoid squashes any number (from −∞ to +∞) into a value between 0 and 1, making it interpretable as a probability. Logistic regression needs it because the raw linear weighted sum can produce any number, which cannot be interpreted as a probability or used directly for classification. The sigmoid bounds the output and gives the model a natural way to express confidence.
+A: The sigmoid squashes any number (from −∞ to +∞) into a value between 0 and 1, making it interpretable as a probability. Logistic regression needs it because the raw linear weighted sum can produce any number, which cannot be used directly for classification.
 
 ---
 
 **Q: Your fraud detection model predicts "not fraud" for everything and gets 99.9% accuracy. What is wrong and how do you fix it?**
 
-A: Class imbalance. When 99.9% of transactions are not fraud, predicting "not fraud" always gives 99.9% accuracy but catches zero fraudsters — accuracy is a meaningless metric here. Fixes: (1) lower the decision threshold from 0.5 to 0.1 or 0.2 so the model flags more transactions as potentially fraudulent — you get more false alarms but catch more real fraud, (2) switch metrics to Precision, Recall, F1, and AUC-ROC — Recall specifically measures "of all actual fraud cases, how many did we catch?", (3) use class weights to penalise misclassifying the minority class more heavily, (4) oversample the minority class using SMOTE or undersample the majority class.
+A: Class imbalance. When 99.9% of transactions are not fraud, predicting "not fraud" always achieves 99.9% accuracy but catches zero fraudsters — accuracy is meaningless here. Fixes: (1) lower the decision threshold from 0.5 to 0.1–0.2 to flag more potential fraud, (2) switch metrics to Precision, Recall, F1, AUC-ROC, (3) use class weights to penalise minority class misclassification more heavily, (4) oversample minority class using SMOTE or undersample majority class.
 
 ---
 
 **Q: Why should you never use MSE as the loss function for logistic regression?**
 
-A: Three reasons: (1) MSE applied to classification produces a non-convex loss landscape with multiple local minima — gradient descent gets stuck and cannot reliably find the global minimum, (2) the output is not bounded to a probability so MSE has no natural interpretation, (3) there is no natural decision threshold on a raw MSE output. Always use binary cross-entropy for binary classification — it is convex, gradient descent reliably finds the minimum, and it directly measures the quality of probability predictions.
+A: Three reasons: (1) MSE produces a non-convex loss landscape for classification — gradient descent gets stuck in local minima, (2) output is not bounded to a probability, (3) no natural decision threshold on a raw number. Always use binary cross-entropy — it is convex and directly measures probability prediction quality.
 
 ---
 
 **Q: When would you use Softmax instead of sigmoid / BCE?**
 
-A: When you have more than two classes (multiclass classification). Sigmoid and BCE are for binary problems — output is a single probability for one class. Softmax outputs a probability for every class simultaneously, all summing to 1, and uses categorical cross-entropy as the loss function. Example: classifying a song as rock / pop / jazz / metal — four classes, use Softmax. Classifying a song as "hit or not" — two classes, use sigmoid + BCE.
+A: When you have more than two classes. Sigmoid and BCE are for binary problems. Softmax outputs a probability for every class simultaneously, all summing to 1, and uses categorical cross-entropy. Example: classifying a song as rock / pop / jazz / metal — four classes, use Softmax.
+
+---
+
+## Topic 4 — Decision Trees
+
+**Q: Your decision tree has 100% training accuracy and 61% test accuracy. What happened and name two specific fixes.**
+
+A: High variance — overfitting. The tree grew too deep and memorised training data including noise. Specific fixes for decision trees: (1) pre-pruning — set max_depth=5, increase min_samples_leaf to force leaves to represent more data, (2) post-pruning — grow the full tree then tune ccp_alpha to remove branches that do not justify their complexity.
+
+---
+
+**Q: What is Gini impurity measuring in plain English?**
+
+A: The probability of being wrong if you randomly picked a sample from a node and randomly assigned it a label based on the class distribution there. A perfectly pure node (all one class) has Gini = 0 — you are never wrong. A perfectly mixed node has Gini = 0.5 — you are wrong half the time. The tree picks splits that reduce Gini the most.
+
+---
+
+**Q: Do you need to scale features before training a decision tree? What about logistic regression on the same data?**
+
+A: No scaling for decision trees — they ask threshold questions on raw values so magnitude is irrelevant. "BPM > 140" works identically whether BPM is normalised or not. Logistic regression absolutely needs scaling — gradient descent is sensitive to feature magnitude and large-range features will dominate training.
+
+---
+
+**Q: Are Gini and entropy the same thing as gradient descent for trees?**
+
+A: They serve the same purpose — guiding the algorithm toward a better model — but through a completely different mechanism. Gradient descent works on continuous parameters, makes small incremental adjustments using calculus, and runs iteratively thousands of times. Gini and entropy work on discrete decisions (which feature, which threshold), make one greedy choice per node by evaluating every possible split, and never revisit that decision. This is called greedy search — locally optimal at each node, not guaranteed globally optimal. Gradient descent is a compass continuously adjusting your heading. Gini/entropy is a scout who picks the best path from your current spot — one decision, no going back.
+
+---
+
+**Q: A non-technical product manager asks why the model predicted "Metal" for a particular song. You used a decision tree. How do you explain it?**
+
+A: Walk through the actual path the song took through the tree as a natural conversation: "First we asked: does this song have heavy guitar? Yes. Then: is the tempo fast? Yes. Then: are the vocals aggressive or melodic? Aggressive. That combination led us to Metal." This is the core advantage of decision trees — complete transparency. Every prediction has a human-readable explanation.
+
+---
+
+## Topic 5 — Random Forests
+
+**Q: Why does averaging many high-variance trees produce a low-variance model? What is the key condition?**
+
+A: Individual trees overfit differently — each is trained on a different bootstrap sample and considers different features at each split, so their errors are uncorrelated. When you average uncorrelated errors, they cancel each other out leaving the genuine signal. The key condition is that errors must be uncorrelated. If all trees saw identical data and features, averaging would change nothing — the errors would be identical and would not cancel. Bootstrap sampling and feature randomness are specifically designed to ensure uncorrelated errors.
+
+---
+
+**Q: Your random forest has 500 trees and is still overfitting. Increasing n_estimators is not helping. What do you tune?**
+
+A: n_estimators has hit its variance-reduction limit — the overfitting is coming from individual tree complexity, not the number of trees. Tune in this order: (1) decrease max_features — less features per split = more randomness = more uncorrelated trees = lower variance, (2) increase min_samples_leaf — forces leaves to represent more samples, smooths decision boundaries significantly, (3) decrease max_depth if still overfitting. Never increase max_depth to fix overfitting — it increases individual tree complexity and makes things worse.
+
+---
+
+**Q: When would you prefer a single decision tree over a random forest?**
+
+A: When interpretability is critical. In regulated industries (healthcare, finance, legal) a model must often be explainable to regulators, doctors, or patients — a single tree you can draw on a whiteboard wins over a black box of 500 trees regardless of accuracy. Also when data is simple enough that a single tree captures it well and you need fast training and inference.
+
+---
+
+**Q: What is out-of-bag evaluation and when would you use it?**
+
+A: Because each tree uses bootstrap sampling (~63% of data), about 37% of rows are left out of each tree's training. The forest evaluates each row using only the trees that never saw it — giving a valid performance estimate without a separate validation set. The correct split is ~63/37 (not 67/33) — mathematically derived from (1 − 1/n)ⁿ → 1/e ≈ 37%. Use OOB when your dataset is small and you cannot afford to hold out a validation set, or as a quick sanity check during training.
 
 ---
 
