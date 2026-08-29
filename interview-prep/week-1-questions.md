@@ -34,89 +34,89 @@ A: High variance — overfitting. The model memorised training data instead of l
 
 **Q: Your model scores 52% on training data and 51% on test data. Both are bad. What is the problem and what is your first move?**
 
-A: High bias — underfitting. The model is too simple to capture the pattern. The small gap between training and test error confirms it is not a variance issue. First move: increase model complexity — add more features, use a more powerful algorithm, or reduce regularisation. More training data will not help here.
+A: High bias — underfitting. Model too simple to capture the pattern. Small gap confirms it is not a variance issue. First move: increase model complexity — add features, use a more powerful algorithm, or reduce regularisation. More data will not help.
 
 ---
 
 **Q: A teammate says "let's just add more training data to fix our model." When does this actually help and when does it not?**
 
-A: More data helps high variance (overfitting) — it gives the model more signal to learn real patterns instead of memorising noise. It does not help high bias (underfitting) — if the model is too simple to capture the pattern, more data is irrelevant. A straight line will never fit a curve regardless of how many points you add. Bias is a capability problem, not a data problem.
+A: More data helps high variance — gives the model more signal to learn real patterns instead of memorising noise. Does not help high bias — if the model is too simple to capture the pattern, more data is irrelevant. Bias is a capability problem, not a data problem.
 
 ---
 
 **Q: If you had infinite data and a perfect model, could you reach 0% error?**
 
-A: No. Total error = Bias² + Variance + Irreducible Error. Irreducible error is noise inherent in the data itself — two near-identical houses selling for different prices due to factors not captured in your features. No model can eliminate this.
+A: No. Total error = Bias² + Variance + Irreducible Error. Irreducible error is noise in the data itself that no model can eliminate.
 
 ---
 
 ## Topic 2 — Linear Regression
 
-**Q: You are predicting song popularity from two features — weeks in top 10 (range 1–52) and number of singles (range 1–5). Should you scale? Which method?**
+**Q: You are predicting song popularity from weeks in top 10 (range 1–52) and number of singles (range 1–5). Should you scale? Which method?**
 
-A: Yes, scaling is required for linear regression because gradient descent is sensitive to feature magnitude. Weeks in top 10 would dominate during training due to its larger range. Use standardisation (Z-score) as the safer default — it handles different distributions well and is robust to outliers. Normalisation works but is sensitive to extreme values.
+A: Yes — gradient descent is sensitive to feature magnitude. Weeks in top 10 would dominate. Use standardisation (Z-score) as the safer default — robust to outliers and different distributions.
 
 ---
 
 **Q: What is the cost function doing and why do we square the errors?**
 
-A: The cost function measures how wrong the model's current predictions are across all training data — it gives a single number that training tries to minimise. We square errors for two reasons: (1) errors can be positive or negative and would cancel out if simply summed — squaring makes all errors positive so they accumulate honestly, (2) squaring penalises large errors disproportionately more, pushing the model to fix its worst mistakes first.
+A: Cost function measures how wrong current predictions are — gives a single number training tries to minimise. Square errors for two reasons: (1) positive and negative errors would cancel if summed directly, (2) squaring penalises large errors disproportionately, pushing the model to fix worst mistakes first.
 
 ---
 
-**Q: Explain gradient descent in plain English — no math, no jargon.**
+**Q: Explain gradient descent in plain English.**
 
-A: Gradient descent is an algorithm that finds the lowest point in a hilly landscape while blindfolded. You can only feel which direction is downhill right under your feet. You take a small step downhill, feel again, take another step, and repeat until the ground feels flat — you have reached the bottom. In ML: the landscape is the loss function, the valley is the minimum error, and each step is a weight update.
-
----
-
-**Q: Your model's loss keeps going up during training instead of down. What is the most likely cause and fix?**
-
-A: High learning rate — the model is taking steps that are too large and overshooting the minimum. Fix: decrease the learning rate (not increase it). Secondary check: ensure features are scaled. Consider switching to Adam optimiser which adapts the learning rate automatically.
+A: Finding the lowest point in a hilly landscape while blindfolded. Feel which direction is downhill, take a small step, feel again, repeat until the ground is flat. In ML: landscape = loss function, valley = minimum error, each step = weight update.
 
 ---
 
-**Q: When would you use MAE instead of MSE as your loss function?**
+**Q: Your model's loss keeps going up during training. What is the cause and fix?**
 
-A: When your data has genuine outliers you do not want to over-penalise. MSE squares errors so a single extreme outlier contributes massively to the loss and distorts training. MAE treats all errors linearly so outliers have proportional influence. Use Huber loss as a middle ground when you have some outliers but still want MSE behaviour for small errors.
+A: High learning rate — overshooting the minimum. Fix: decrease the learning rate (never increase it). Secondary check: ensure features are scaled. Consider Adam optimiser which adapts learning rate automatically.
+
+---
+
+**Q: When would you use MAE instead of MSE?**
+
+A: When data has genuine outliers you do not want to over-penalise. MSE squares errors so one extreme outlier dominates training. MAE treats all errors linearly. Use Huber loss as a middle ground.
 
 ---
 
 **Q: When would you not use linear regression?**
 
-A: When its assumptions are violated: (1) non-linear relationship — switch to polynomial features or tree-based models, (2) multicollinearity — weights become unstable, use Ridge regression or PCA, (3) heteroscedasticity — try log-transforming the target, (4) non-independent data (e.g. time series) — use time-series specific models.
+A: When assumptions are violated: non-linear relationship, multicollinearity, heteroscedasticity, or non-independent data (time series).
 
 ---
 
 ## Topic 3 — Logistic Regression
 
-**Q: Is logistic regression a regression or classification algorithm? Why the confusing name?**
+**Q: Is logistic regression a regression or classification algorithm?**
 
-A: Classification algorithm. The "regression" refers to the internal mathematical technique (a linear weighted sum), not the output type. Output is always a probability converted to a class — never a continuous number.
+A: Classification. The "regression" refers to the internal mathematical technique, not the output type. Output is always a probability converted to a class.
 
 ---
 
 **Q: What does the sigmoid function do and why does logistic regression need it?**
 
-A: The sigmoid squashes any number (from −∞ to +∞) into a value between 0 and 1, making it interpretable as a probability. Logistic regression needs it because the raw linear weighted sum can produce any number, which cannot be used directly for classification.
+A: Squashes any number into 0–1, making it interpretable as a probability. The raw linear weighted sum can produce any number — sigmoid bounds it for classification use.
 
 ---
 
-**Q: Your fraud detection model predicts "not fraud" for everything and gets 99.9% accuracy. What is wrong and how do you fix it?**
+**Q: Your fraud detection model gets 99.9% accuracy but catches zero fraudsters. What is wrong?**
 
-A: Class imbalance. When 99.9% of transactions are not fraud, predicting "not fraud" always achieves 99.9% accuracy but catches zero fraudsters — accuracy is meaningless here. Fixes: (1) lower the decision threshold from 0.5 to 0.1–0.2 to flag more potential fraud, (2) switch metrics to Precision, Recall, F1, AUC-ROC, (3) use class weights to penalise minority class misclassification more heavily, (4) oversample minority class using SMOTE or undersample majority class.
-
----
-
-**Q: Why should you never use MSE as the loss function for logistic regression?**
-
-A: Three reasons: (1) MSE produces a non-convex loss landscape for classification — gradient descent gets stuck in local minima, (2) output is not bounded to a probability, (3) no natural decision threshold on a raw number. Always use binary cross-entropy — it is convex and directly measures probability prediction quality.
+A: Class imbalance. Accuracy is meaningless when 99.9% of data is one class. Fixes: lower decision threshold, switch to Precision/Recall/F1/AUC-ROC metrics, use class weights, oversample minority class with SMOTE.
 
 ---
 
-**Q: When would you use Softmax instead of sigmoid / BCE?**
+**Q: Why should you never use MSE for logistic regression?**
 
-A: When you have more than two classes. Sigmoid and BCE are for binary problems. Softmax outputs a probability for every class simultaneously, all summing to 1, and uses categorical cross-entropy. Example: classifying a song as rock / pop / jazz / metal — four classes, use Softmax.
+A: Three reasons: (1) produces non-convex loss landscape — gradient descent gets stuck, (2) output not bounded to a probability, (3) no natural decision threshold on a raw number. Use binary cross-entropy.
+
+---
+
+**Q: When would you use Softmax instead of sigmoid?**
+
+A: When you have more than two classes. Sigmoid and BCE are for binary problems. Softmax outputs a probability for every class simultaneously, all summing to 1, with categorical cross-entropy as the loss.
 
 ---
 
@@ -124,57 +124,187 @@ A: When you have more than two classes. Sigmoid and BCE are for binary problems.
 
 **Q: Your decision tree has 100% training accuracy and 61% test accuracy. What happened and name two specific fixes.**
 
-A: High variance — overfitting. The tree grew too deep and memorised training data including noise. Specific fixes for decision trees: (1) pre-pruning — set max_depth=5, increase min_samples_leaf to force leaves to represent more data, (2) post-pruning — grow the full tree then tune ccp_alpha to remove branches that do not justify their complexity.
+A: High variance — overfitting. Tree grew too deep and memorised training data. Fixes: (1) pre-pruning — set max_depth, increase min_samples_leaf, (2) post-pruning — tune ccp_alpha to remove branches that do not justify their complexity.
 
 ---
 
 **Q: What is Gini impurity measuring in plain English?**
 
-A: The probability of being wrong if you randomly picked a sample from a node and randomly assigned it a label based on the class distribution there. A perfectly pure node (all one class) has Gini = 0 — you are never wrong. A perfectly mixed node has Gini = 0.5 — you are wrong half the time. The tree picks splits that reduce Gini the most.
+A: The probability of being wrong if you randomly picked a sample from a node and randomly assigned it a label based on the class distribution there. Pure node = Gini 0. Perfectly mixed = Gini 0.5.
 
 ---
 
-**Q: Do you need to scale features before training a decision tree? What about logistic regression on the same data?**
+**Q: Do you need to scale features before training a decision tree? What about logistic regression?**
 
-A: No scaling for decision trees — they ask threshold questions on raw values so magnitude is irrelevant. "BPM > 140" works identically whether BPM is normalised or not. Logistic regression absolutely needs scaling — gradient descent is sensitive to feature magnitude and large-range features will dominate training.
+A: No scaling for decision trees — threshold questions on raw values, magnitude irrelevant. Logistic regression absolutely needs scaling — gradient descent sensitive to feature magnitude.
 
 ---
 
 **Q: Are Gini and entropy the same thing as gradient descent for trees?**
 
-A: They serve the same purpose — guiding the algorithm toward a better model — but through a completely different mechanism. Gradient descent works on continuous parameters, makes small incremental adjustments using calculus, and runs iteratively thousands of times. Gini and entropy work on discrete decisions (which feature, which threshold), make one greedy choice per node by evaluating every possible split, and never revisit that decision. This is called greedy search — locally optimal at each node, not guaranteed globally optimal. Gradient descent is a compass continuously adjusting your heading. Gini/entropy is a scout who picks the best path from your current spot — one decision, no going back.
+A: Same purpose, completely different mechanism. Gradient descent: continuous parameters, incremental adjustments, iterative, uses calculus. Gini/entropy: discrete decisions, one greedy choice per node, evaluates every possible split, never revisits. This is called greedy search.
 
 ---
 
-**Q: A non-technical product manager asks why the model predicted "Metal" for a particular song. You used a decision tree. How do you explain it?**
+**Q: A non-technical product manager asks why the model predicted Metal for a particular song.**
 
-A: Walk through the actual path the song took through the tree as a natural conversation: "First we asked: does this song have heavy guitar? Yes. Then: is the tempo fast? Yes. Then: are the vocals aggressive or melodic? Aggressive. That combination led us to Metal." This is the core advantage of decision trees — complete transparency. Every prediction has a human-readable explanation.
+A: Walk through the actual path: "First we asked does this song have heavy guitar — yes. Then is the tempo fast — yes. Then are the vocals aggressive — yes. That combination led us to Metal." Complete transparency — the core advantage of decision trees.
 
 ---
 
 ## Topic 5 — Random Forests
 
-**Q: Why does averaging many high-variance trees produce a low-variance model? What is the key condition?**
+**Q: Why does averaging many high-variance trees produce a low-variance model?**
 
-A: Individual trees overfit differently — each is trained on a different bootstrap sample and considers different features at each split, so their errors are uncorrelated. When you average uncorrelated errors, they cancel each other out leaving the genuine signal. The key condition is that errors must be uncorrelated. If all trees saw identical data and features, averaging would change nothing — the errors would be identical and would not cancel. Bootstrap sampling and feature randomness are specifically designed to ensure uncorrelated errors.
+A: Individual trees overfit differently — trained on different bootstrap samples with different features at each split, so errors are uncorrelated. Averaging uncorrelated errors cancels them out. Key condition: errors must be uncorrelated. Bootstrap sampling and feature randomness ensure this.
 
 ---
 
 **Q: Your random forest has 500 trees and is still overfitting. Increasing n_estimators is not helping. What do you tune?**
 
-A: n_estimators has hit its variance-reduction limit — the overfitting is coming from individual tree complexity, not the number of trees. Tune in this order: (1) decrease max_features — less features per split = more randomness = more uncorrelated trees = lower variance, (2) increase min_samples_leaf — forces leaves to represent more samples, smooths decision boundaries significantly, (3) decrease max_depth if still overfitting. Never increase max_depth to fix overfitting — it increases individual tree complexity and makes things worse.
+A: n_estimators has hit its variance limit. Tune in order: (1) decrease max_features, (2) increase min_samples_leaf, (3) decrease max_depth. Never increase max_depth to fix overfitting.
 
 ---
 
 **Q: When would you prefer a single decision tree over a random forest?**
 
-A: When interpretability is critical. In regulated industries (healthcare, finance, legal) a model must often be explainable to regulators, doctors, or patients — a single tree you can draw on a whiteboard wins over a black box of 500 trees regardless of accuracy. Also when data is simple enough that a single tree captures it well and you need fast training and inference.
+A: When interpretability is critical — regulated industries (healthcare, finance, legal) where a model must be explainable to regulators or patients.
 
 ---
 
 **Q: What is out-of-bag evaluation and when would you use it?**
 
-A: Because each tree uses bootstrap sampling (~63% of data), about 37% of rows are left out of each tree's training. The forest evaluates each row using only the trees that never saw it — giving a valid performance estimate without a separate validation set. The correct split is ~63/37 (not 67/33) — mathematically derived from (1 − 1/n)ⁿ → 1/e ≈ 37%. Use OOB when your dataset is small and you cannot afford to hold out a validation set, or as a quick sanity check during training.
+A: Bootstrap sampling uses ~63% of data per tree, leaving ~37% out-of-bag. Free validation score without a separate validation set. Correct split is ~63/37 — from (1−1/n)ⁿ → 1/e ≈ 37%. Use when dataset is small.
+
+---
+
+## Topic 6 — Gradient Boosting & XGBoost
+
+**Q: What is each tree in a gradient boosting model actually learning?**
+
+A: The residuals — actual minus predicted from the current combined model. Residuals are the negative gradient of MSE loss, so fitting a tree to residuals is one gradient descent step in function space.
+
+---
+
+**Q: Your XGBoost model is overfitting. Reducing n_estimators is not enough. What else do you tune?**
+
+A: Decrease max_depth (keep shallow, 3–6), decrease learning_rate (never increase it), reduce subsample and colsample_bytree, increase gamma, increase reg_lambda/reg_alpha.
+
+---
+
+**Q: What conditions would make you push for XGBoost over random forest?**
+
+A: Maximum predictive accuracy needed, baseline is underfitting, data has missing values, time to tune properly. Workflow: random forest as quick baseline first, XGBoost to push further.
+
+---
+
+**Q: Why can adding more trees cause overfitting in XGBoost but not in random forests?**
+
+A: Random forests average independent trees — more averaging always helps or is neutral. XGBoost trees fit residuals sequentially — later trees fit increasingly noisy residuals. Always use early stopping.
+
+---
+
+## Topic 7 — k-NN & SVM
+
+**Q: You have 500 features and 10,000 samples. A teammate suggests k-NN. What do you tell them?**
+
+A: k-NN breaks in high dimensions due to the curse of dimensionality — all points become approximately equidistant. Also slow at prediction on large datasets — computes distances to every training point. Apply PCA first, then reconsider.
+
+---
+
+**Q: What is a support vector in plain English?**
+
+A: An actual training data point — the samples sitting closest to the decision boundary on each side. The hyperplane is positioned to maximise distance to these points. Every other training point is irrelevant. Support vectors are points, not lines.
+
+---
+
+**Q: Your SVM is overfitting. Which hyperparameter do you tune and in which direction?**
+
+A: Decrease C — high C forces classification of every training point correctly, creating a complex boundary. Lowering C allows some misclassification, widens the margin, better generalisation. If using RBF, also decrease gamma.
+
+---
+
+**Q: Both k-NN and SVM require feature scaling. Why?**
+
+A: Both are distance-based. Without scaling, large-range features dominate distance calculations. If house size ranges 100–5000 and rooms 1–10, house size contributes 1,000,000 to squared distance vs 25 for rooms. Large-range features drown out small-range ones entirely.
+
+---
+
+## Topic 8 — k-Means Clustering
+
+**Q: You want to cluster 10M users with 50 features. Walk through your approach including choosing k.**
+
+A: Standardise all features, apply PCA to reduce dimensions, run k-Means for k=2 to 15 plotting inertia (elbow method), validate with silhouette score, use k-Means++ initialisation, interpret clusters by examining average feature values per cluster.
+
+---
+
+**Q: Your k-Means produces one cluster with 9.8M users and two with 100K each. What went wrong?**
+
+A: Almost certainly a feature scaling problem — one large-range feature dominates distance calculations pulling most users to one centroid. Standardise all features and re-run. Check whether imbalance is genuine before assuming it is a bug.
+
+---
+
+**Q: A teammate suggests using k-Means for fraud detection. What is the problem?**
+
+A: k-Means assigns every point to a cluster — no concept of "this point does not belong anywhere." Fraud cases are rare, diverse, and do not form dense clusters — they get absorbed into legitimate transaction clusters. Use DBSCAN (labels outliers as noise) or Isolation Forest instead. Switch to supervised classification if labelled examples are available.
+
+---
+
+**Q: What is inertia and why can you not use it alone to choose k?**
+
+A: Inertia is the sum of squared distances from every point to its assigned centroid — measures cluster compactness. Cannot use alone because inertia always decreases as k increases — at k=n_samples, inertia=0. Use the elbow method (find point of diminishing returns) and validate with silhouette score.
+
+---
+
+## Topic 9 — Evaluation Metrics
+
+**Q: Your cancer detection model has 99% recall and 30% precision. Is this good or bad?**
+
+A: Recall=99% means the model catches almost every real cancer case — missing very few. Precision=30% means 70% of its positive flags are false alarms. For cancer detection this is a good trade-off — missing a real case is far more dangerous than a false alarm that leads to further testing. The threshold is deliberately set low.
+
+---
+
+**Q: Why does F1 use harmonic mean instead of arithmetic mean?**
+
+A: Arithmetic mean hides extreme imbalance. Precision=1.0, Recall=0.01 → arithmetic mean=0.505 (looks okay), F1=0.02 (correctly shows the model is nearly useless). Harmonic mean punishes extreme imbalance between the two metrics — forces both to be meaningfully high before the score looks good.
+
+---
+
+**Q: Your model has AUC-ROC of 0.5. What does this tell you?**
+
+A: The model has zero discriminative power — no better than random. Given a random positive and random negative, it ranks them correctly only by chance. Diagnose: check for data leakage, class imbalance in training, feature engineering problems, or wrong model choice.
+
+---
+
+**Q: Content moderation system — 1M normal posts, 1K hate speech. Full evaluation strategy.**
+
+A: Accuracy is useless at 0.1% positive class. Primary metric: Recall — missing hate speech causes real harm. Also track F1 and AUC-ROC. Use Stratified k-Fold (k=5) — preserves 0.1%/99.9% ratio in every fold. Imbalance fixes: class_weight='balanced', SMOTE, lower decision threshold post-training. Set final threshold based on moderation team capacity — how many flagged posts can they review per day.
+
+---
+
+## Topic 10 — Regularisation
+
+**Q: 200 features, most suspected noise. L1 or L2?**
+
+A: L1 (Lasso) — it drives irrelevant feature weights to exactly zero, automatically selecting only the meaningful ones. L2 would keep all 200 features with reduced weights — not what you want when most are noise. L1 gives a sparse, interpretable model. L2 gives a dense, stable one.
+
+---
+
+**Q: Your Ridge regression model is underfitting. What do you do to lambda?**
+
+A: Decrease lambda — it is too high, penalising the model so heavily that weights are driven near zero and the model is too simple to capture real patterns. Reducing lambda weakens the penalty and allows the model to express more complexity.
+
+---
+
+**Q: What is the key difference between L1 and L2?**
+
+A: L1 drives weights to exactly zero (feature selection — sparse model). L2 shrinks all weights toward zero but never reaches zero (all features retained — dense stable model). L1 is unstable under multicollinearity — arbitrarily picks one correlated feature and zeros others. L2 distributes weight across correlated features. Use L1 when most features are noise. Use L2 as the default.
+
+---
+
+**Q: Does increasing lambda increase bias, variance, or both?**
+
+A: Increasing lambda increases bias and decreases variance. Stronger penalty = simpler model = less expressive = more bias, less variance. Too high lambda = underfitting. The goal is the sweet spot — not maximum regularisation. If already underfitting, decrease lambda or change the model entirely.
 
 ---
 
